@@ -3,67 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Datos y Promedio</title>
+  <title>Producto Interno y Ortogonalidad</title>
 </head>
 <body>
 
-<h2>Ingresar Datos y Contar los Mayores que el Promedio</h2>
+<h2>Producto Interno y Ortogonalidad de Listas de Números</h2>
 
-<label for="cantidadDatos">Ingrese la cantidad de datos: </label>
-<input type="number" id="cantidadDatos">
+<label for="listaA">Ingrese la lista A (números separados por comas): </label>
+<input type="text" id="listaA">
 
-<button onclick="ingresarDatos()">Ingresar Datos</button>
+<label for="listaB">Ingrese la lista B (números separados por comas): </label>
+<input type="text" id="listaB">
 
-<div id="datosContainer" style="display: none;">
-  <h3>Ingrese los datos uno por uno:</h3>
-  <div id="datosInputs"></div>
-  <button onclick="calcularPromedio()">Calcular Promedio</button>
-</div>
+<button onclick="calcularProductoInterno()">Calcular Producto Interno</button>
 
 <p id="resultado"></p>
 
 <script>
-  function ingresarDatos() {
-    const cantidadDatos = parseInt(document.getElementById("cantidadDatos").value);
+  function calcularProductoInterno() {
+    const listaA = document.getElementById("listaA").value;
+    const listaB = document.getElementById("listaB").value;
 
-    if (isNaN(cantidadDatos) || cantidadDatos <= 0) {
-      alert("Ingrese un número válido para la cantidad de datos.");
+    const arrayA = listaA.split(",").map(Number);
+    const arrayB = listaB.split(",").map(Number);
+
+    if (arrayA.length !== arrayB.length) {
+      alert("Las listas deben tener la misma longitud.");
       return;
     }
 
-    const datosContainer = document.getElementById("datosContainer");
-    const datosInputs = document.getElementById("datosInputs");
-
-    // Limpiar cualquier entrada anterior
-    datosInputs.innerHTML = "";
-
-    for (let i = 0; i < cantidadDatos; i++) {
-      const input = document.createElement("input");
-      input.type = "number";
-      input.placeholder = Dato ${i + 1};
-      datosInputs.appendChild(input);
-    }
-
-    datosContainer.style.display = "block";
-  }
-
-  function calcularPromedio() {
-    const datosInputs = document.getElementById("datosInputs").querySelectorAll("input");
-
-    const datos = Array.from(datosInputs).map(input => parseFloat(input.value));
-
-    if (datos.some(isNaN)) {
-      alert("Ingrese datos numéricos válidos.");
-      return;
-    }
-
-    const suma = datos.reduce((total, dato) => total + dato, 0);
-    const promedio = suma / datos.length;
-
-    const mayoresQuePromedio = datos.filter(dato => dato > promedio);
+    const productoInterno = calcularProductoInternoArrays(arrayA, arrayB);
 
     const resultadoElement = document.getElementById("resultado");
-    resultadoElement.textContent = El promedio es ${promedio}. Hay ${mayoresQuePromedio.length} dato(s) mayor(es) que el promedio.;
+    resultadoElement.textContent = `El producto interno es: ${productoInterno}`;
+
+    if (productoInterno === 0) {
+      resultadoElement.textContent += "\nLas listas son ortogonales.";
+    } else {
+      resultadoElement.textContent += "\nLas listas no son ortogonales.";
+    }
+  }
+
+  function calcularProductoInternoArrays(arrayA, arrayB) {
+    return arrayA.reduce((productoInterno, valorA, index) => {
+      return productoInterno + valorA * arrayB[index];
+    }, 0);
   }
 </script>
 
