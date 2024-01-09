@@ -3,68 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador de Campeonato de Fútbol</title>
+  <title>Verificador de Sudoku</title>
 </head>
 <body>
 
-<h2>Simulador de Campeonato de Fútbol</h2>
+<h2>Verificador de Sudoku</h2>
 
-<div id="inputEquipos">
-  <label for="equipos">Ingrese los nombres de los equipos (separados por coma): </label>
-  <input type="text" id="equipos" placeholder="Equipo1,Equipo2,Equipo3,...">
-  <button onclick="iniciarCampeonato()">Iniciar Campeonato</button>
-</div>
+<label for="sudokuInput">Ingrese la solución de Sudoku (fila por fila, números separados por comas): </label>
+<textarea id="sudokuInput" rows="9"></textarea>
 
-<div id="resultados" style="display: none;">
-  <h3>Resultados del Campeonato</h3>
-  <ul id="rondas"></ul>
-  <p id="campeon"></p>
-</div>
+<button onclick="verificarSudoku()">Verificar Sudoku</button>
+
+<p id="resultado"></p>
 
 <script>
-  function iniciarCampeonato() {
-    const equiposInput = document.getElementById("equipos").value;
-    const equipos = equiposInput.split(",").map(equipo => equipo.trim());
+  function verificarSudoku() {
+    const sudokuInput = document.getElementById("sudokuInput").value;
+    const sudokuFilas = sudokuInput.trim().split("\n");
 
-    if (equipos.length !== 8) {
-      alert("Debe ingresar exactamente 8 equipos.");
+    if (sudokuFilas.length !== 9) {
+      alert("Ingrese una solución válida de Sudoku (9 filas).");
       return;
     }
 
-    const rondas = [];
-    rondas.push(equipos);
+    const sudoku = sudokuFilas.map(fila => fila.split(",").map(numero => parseInt(numero.trim())));
 
-    while (rondas[rondas.length - 1].length > 1) {
-      const nuevaRonda = [];
-      for (let i = 0; i < rondas[rondas.length - 1].length; i += 2) {
-        const equipo1 = rondas[rondas.length - 1][i];
-        const equipo2 = rondas[rondas.length - 1][i + 1];
-
-        const resultado = prompt(Ingrese el resultado del partido entre ${equipo1} y ${equipo2}:);
-        const ganador = (resultado === '1') ? equipo1 : equipo2;
-        nuevaRonda.push(ganador);
-      }
-      rondas.push(nuevaRonda);
+    if (!esSudokuValido(sudoku)) {
+      mostrarResultado("La solución de Sudoku no es válida.");
+    } else {
+      mostrarResultado("La solución de Sudoku es válida.");
     }
-
-    mostrarResultados(rondas);
   }
 
-  function mostrarResultados(rondas) {
-    const resultadosElement = document.getElementById("resultados");
-    resultadosElement.style.display = "block";
+  function esSudokuValido(sudoku) {
+    return filasValidas(sudoku) && columnasValidas(sudoku) && regionesValidas(sudoku);
+  }
 
-    const rondasElement = document.getElementById("rondas");
-    rondasElement.innerHTML = "";
-
-    for (let i = 0; i < rondas.length; i++) {
-      const rondaItem = document.createElement("li");
-      rondaItem.textContent = Ronda ${i + 1}: ${rondas[i].join(" -> ")};
-      rondasElement.appendChild(rondaItem);
+  function filasValidas(sudoku) {
+    for (let fila = 0; fila < 9; fila++) {
+      if (!esConjuntoValido(sudoku[fila])) {
+        return false;
+      }
     }
+    return true;
+  }
 
-    const campeonElement = document.getElementById("campeon");
-    campeonElement.textContent = ¡${rondas[rondas.length - 1][0]} es el campeón del torneo!;
+  function columnasValidas(sudoku) {
+    for (let columna = 0; columna < 9; columna++) {
+      const conjuntoColumna = [];
+      for (let fila = 0; fila < 9; fila++) {
+        conjuntoColumna.push(sudoku[fila][columna]);
+      }
+      if (!esConjuntoValido(conjuntoColumna)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function regionesValidas(sudoku) {
+    for (let filaInicio = 0; filaInicio < 9; filaInicio += 3) {
+      for (let columnaInicio = 0; columnaInicio < 9; columnaInicio += 3) {
+        const conjuntoRegion = [];
+        for (let fila = filaInicio; fila < filaInicio + 3; fila++) {
+          for (let columna = columnaInicio; columna < columnaInicio + 3; columna++) {
+            conjuntoRegion.push(sudoku[fila][columna]);
+          }
+        }
+        if (!esConjuntoValido(conjuntoRegion)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function esConjuntoValido(conjunto) {
+    const numerosUnicos = new Set(conjunto);
+    return numerosUnicos.size === 9;
+  }
+
+  function mostrarResultado(resultado) {
+    const resultadoElement = document.getElementById("resultado");
+    resultadoElement.textContent = resultado;
   }
 </script>
 
