@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datos y Promedio</title>
+</head>
+<body>
+
+<h2>Ingresar Datos y Contar los Mayores que el Promedio</h2>
+
+<label for="cantidadDatos">Ingrese la cantidad de datos: </label>
+<input type="number" id="cantidadDatos">
+
+<button onclick="ingresarDatos()">Ingresar Datos</button>
+
+<div id="datosContainer" style="display: none;">
+  <h3>Ingrese los datos uno por uno:</h3>
+  <div id="datosInputs"></div>
+  <button onclick="calcularPromedio()">Calcular Promedio</button>
+</div>
+
+<p id="resultado"></p>
+
+<script>
+  function ingresarDatos() {
+    const cantidadDatos = parseInt(document.getElementById("cantidadDatos").value);
+
+    if (isNaN(cantidadDatos) || cantidadDatos <= 0) {
+      alert("Ingrese un número válido para la cantidad de datos.");
+      return;
+    }
+
+    const datosContainer = document.getElementById("datosContainer");
+    const datosInputs = document.getElementById("datosInputs");
+
+    // Limpiar cualquier entrada anterior
+    datosInputs.innerHTML = "";
+
+    for (let i = 0; i < cantidadDatos; i++) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.placeholder = Dato ${i + 1};
+      datosInputs.appendChild(input);
+    }
+
+    datosContainer.style.display = "block";
+  }
+
+  function calcularPromedio() {
+    const datosInputs = document.getElementById("datosInputs").querySelectorAll("input");
+
+    const datos = Array.from(datosInputs).map(input => parseFloat(input.value));
+
+    if (datos.some(isNaN)) {
+      alert("Ingrese datos numéricos válidos.");
+      return;
+    }
+
+    const suma = datos.reduce((total, dato) => total + dato, 0);
+    const promedio = suma / datos.length;
+
+    const mayoresQuePromedio = datos.filter(dato => dato > promedio);
+
+    const resultadoElement = document.getElementById("resultado");
+    resultadoElement.textContent = El promedio es ${promedio}. Hay ${mayoresQuePromedio.length} dato(s) mayor(es) que el promedio.;
+  }
+</script>
+
+</body>
+</html>
