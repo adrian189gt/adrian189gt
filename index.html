@@ -3,57 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verificación de Arreglo Cuadrado</title>
+  <title>Simulador de Campeonato de Fútbol</title>
 </head>
 <body>
 
-<h2>Verificación de Arreglo Cuadrado</h2>
+<h2>Simulador de Campeonato de Fútbol</h2>
 
-<label for="dimension">Ingrese la dimensión (n) del arreglo cuadrado: </label>
-<input type="number" id="dimension" min="1">
+<div id="inputEquipos">
+  <label for="equipos">Ingrese los nombres de los equipos (separados por coma): </label>
+  <input type="text" id="equipos" placeholder="Equipo1,Equipo2,Equipo3,...">
+  <button onclick="iniciarCampeonato()">Iniciar Campeonato</button>
+</div>
 
-<button onclick="verificarArreglo()">Verificar Arreglo</button>
-
-<p id="resultado"></p>
+<div id="resultados" style="display: none;">
+  <h3>Resultados del Campeonato</h3>
+  <ul id="rondas"></ul>
+  <p id="campeon"></p>
+</div>
 
 <script>
-  function verificarArreglo() {
-    const dimension = parseInt(document.getElementById("dimension").value);
+  function iniciarCampeonato() {
+    const equiposInput = document.getElementById("equipos").value;
+    const equipos = equiposInput.split(",").map(equipo => equipo.trim());
 
-    if (isNaN(dimension) || dimension <= 0) {
-      alert("Ingrese un número válido para la dimensión.");
+    if (equipos.length !== 8) {
+      alert("Debe ingresar exactamente 8 equipos.");
       return;
     }
 
-    // Crear el arreglo cuadrado
-    const arregloCuadrado = [];
-    let contador = 1;
-    for (let i = 0; i < dimension; i++) {
-      arregloCuadrado.push([]);
-      for (let j = 0; j < dimension; j++) {
-        arregloCuadrado[i].push(contador++);
+    const rondas = [];
+    rondas.push(equipos);
+
+    while (rondas[rondas.length - 1].length > 1) {
+      const nuevaRonda = [];
+      for (let i = 0; i < rondas[rondas.length - 1].length; i += 2) {
+        const equipo1 = rondas[rondas.length - 1][i];
+        const equipo2 = rondas[rondas.length - 1][i + 1];
+
+        const resultado = prompt(Ingrese el resultado del partido entre ${equipo1} y ${equipo2}:);
+        const ganador = (resultado === '1') ? equipo1 : equipo2;
+        nuevaRonda.push(ganador);
       }
+      rondas.push(nuevaRonda);
     }
 
-    // Verificar si está conformado por números consecutivos
-    let esConsecutivo = true;
-    for (let i = 0; i < dimension; i++) {
-      for (let j = 0; j < dimension; j++) {
-        if (arregloCuadrado[i][j] !== i * dimension + j + 1) {
-          esConsecutivo = false;
-          break;
-        }
-      }
-      if (!esConsecutivo) break;
+    mostrarResultados(rondas);
+  }
+
+  function mostrarResultados(rondas) {
+    const resultadosElement = document.getElementById("resultados");
+    resultadosElement.style.display = "block";
+
+    const rondasElement = document.getElementById("rondas");
+    rondasElement.innerHTML = "";
+
+    for (let i = 0; i < rondas.length; i++) {
+      const rondaItem = document.createElement("li");
+      rondaItem.textContent = Ronda ${i + 1}: ${rondas[i].join(" -> ")};
+      rondasElement.appendChild(rondaItem);
     }
 
-    // Mostrar resultado
-    const resultadoElement = document.getElementById("resultado");
-    if (esConsecutivo) {
-      resultadoElement.textContent = "El arreglo está conformado por números consecutivos.";
-    } else {
-      resultadoElement.textContent = "El arreglo NO está conformado por números consecutivos.";
-    }
+    const campeonElement = document.getElementById("campeon");
+    campeonElement.textContent = ¡${rondas[rondas.length - 1][0]} es el campeón del torneo!;
   }
 </script>
 
